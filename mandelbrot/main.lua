@@ -38,12 +38,20 @@ function keyPressed()
 end
 
 function drawMandelbrot()
-    for x = 0, height do
-        for y = 0, width do
-            local c = pixelToPoint(x, y)
-            local isIn, iter = table.unpack(calculatePointInSet(c))
+    loadPixels()
+
+    for x = 0, width - 1 do
+        for y = 0, height - 1 do
+            local idx = (x + (y * width)) * 4
+
+            local cx, cy = table.unpack(pixelToPoint(x, y))
+            local isIn, iter = table.unpack(calculatePointInSet(cx, cy))
+
             if isIn then
-                set(x, y, color(0, 0, 0))
+                pixels[idx] = 0
+                pixels[idx + 1] = 0
+                pixels[idx + 2] = 0
+                pixels[idx + 3] = 255
             elseif iter > 1 then
                 -- FUN COLORING: Math-based RGB banding
                 -- We multiply 'iter' by different prime-ish numbers to create offset color cycles.
@@ -52,9 +60,15 @@ function drawMandelbrot()
                 local g = (iter * 7) % 255
                 local b = (iter * 23) % 255
 
-                set(x, y, color(r, g, b))
+                pixels[idx] = r
+                pixels[idx + 1] = g
+                pixels[idx + 2] = b
+                pixels[idx + 3] = 255
             else
-                set(x, y, color(55, 55, 55))
+                pixels[idx] = 55
+                pixels[idx + 1] = 55
+                pixels[idx + 2] = 55
+                pixels[idx + 3] = 255
             end
         end
     end
@@ -70,20 +84,21 @@ function pixelToPoint(x, y)
     -- Noramlize to [-2, 2] range
     local x2 = x1 * 4 / width
     local y2 = y1 * 4 / height
-    
+
     -- Reduce to zoomed-in range and apply pan offset
     local x3 = x2 / zoom + panX
     local y3 = y2 / zoom + panY
 
     return {
-        x = x3,
-        y = y3,
+        x3,
+        y3,
     }
 end
 
-function calculatePointInSet(c)
+function calculatePointInSet(cx, cy)
     -- x represents the real part, y represents the imaginary part
-    local z = { x = 0, y = 0 }
+    local zx = 0
+    local zy = 0
     -- Mathematically proven that any point greater than
     -- distance 2 will diverge to infinity
     local bounds = 2
@@ -91,17 +106,18 @@ function calculatePointInSet(c)
 
     local iter = 0
     while iter < 100 do
-        z = {
-            -- z^2 = (zx + zy*i)^2 = zx^2 + zy^2 * i^2 + (2 * zx * zy)i
-            -- z = (zx^2 - zy^2 + cx) + (2 * zx * zy + cy)i
-            x = z.x * z.x - z.y * z.y + c.x,
-            y = 2 * z.x * z.y + c.y
-        }
+        local zx2 = zx * zx
+        local zy2 = zy * zy
 
-        if dist(z.x, z.y, 0, 0) > bounds then
+        if zx2 + zy2 > bounds * 2 then
             isIn = false
             break
         end
+
+        -- z^2 = (zx + zy*i)^2 = zx^2 + zy^2 * i^2 + (2 * zx * zy)i
+        -- z = (zx^2 - zy^2 + cx) + (2 * zx * zy + cy)i
+        zy = 2 * zx * zy + cy
+        zx = zx2 - zy2 + cx
 
         iter = iter + 1
     end
