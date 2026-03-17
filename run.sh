@@ -1,26 +1,36 @@
 #!/bin/bash
 
-# 1. Check if a folder name was provided
+# Check if folder argument is provided
 if [ -z "$1" ]; then
     echo "Usage: ./run.sh <folder_name>"
     exit 1
 fi
 
-FOLDER_NAME=$1
-TARGET_FILE="$FOLDER_NAME/main.lua"
+FOLDER=$1
+SOURCE="$FOLDER/main.lua"
+DEST="./main.lua"
 
-# 2. Check if the folder and main.lua exist
-if [ ! -f "$TARGET_FILE" ]; then
-    echo "Error: '$TARGET_FILE' not found."
+# Validation
+if [ ! -f "$SOURCE" ]; then
+    echo "Error: $SOURCE not found!"
     exit 1
 fi
 
-# 3. Copy main.lua to the current directory (root)
-cp "$TARGET_FILE" ./main.lua
+# Initial Sync
+cp "$SOURCE" "$DEST"
 
-# 4. Run Love2D
-# Note: '.' tells Love to run the current directory
+# Start the watcher in the background
+# -q (quiet), -m (monitor), -e modify (event)
+inotifywait -q -m -e modify "$SOURCE" | while read -r line; do
+    cp "$SOURCE" "$DEST"
+    echo "Synced change from $SOURCE at $(date +%H:%M:%S)"
+done &
+
+WATCHER_PID=$!
+
+# Run Love2D
+echo "Watcher active (PID: $WATCHER_PID). Launching LÖVE..."
 love .
 
-# 5. Clean up: Delete the main.lua from root after Love exits
-rm ./main.lua
+kill $WATCHER_PID 2>/dev/null
+rm -f "$DEST"
