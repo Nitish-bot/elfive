@@ -1,7 +1,11 @@
 require("L5")
 
-local width = 1000.
-local height = 1000.
+local width = 400.
+local height = 400.
+
+local zoom = 1.
+local panX = 0.
+local panY = 0.
 
 function setup()
     size(width, height)
@@ -15,6 +19,22 @@ end
 
 function draw()
     drawMandelbrot()
+end
+
+function keyPressed()
+    if key == "w" then
+        panY = panY - 1 / zoom
+    elseif key == "s" then
+        panY = panY + 1 / zoom
+    elseif key == "a" then
+        panX = panX - 1 / zoom
+    elseif key == "d" then
+        panX = panX + 1 / zoom
+    elseif key == "e" then
+        zoom = zoom + 5
+    elseif key == "q" then
+        zoom = zoom - 5
+    end
 end
 
 function drawMandelbrot()
@@ -50,10 +70,14 @@ function pixelToPoint(x, y)
     -- Noramlize to [-2, 2] range
     local x2 = x1 * 4 / width
     local y2 = y1 * 4 / height
+    
+    -- Reduce to zoomed-in range and apply pan offset
+    local x3 = x2 / zoom + panX
+    local y3 = y2 / zoom + panY
 
     return {
-        x = x2,
-        y = y2,
+        x = x3,
+        y = y3,
     }
 end
 
