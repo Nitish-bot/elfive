@@ -25,6 +25,8 @@ if not filename then
     return
 end
 
+-- To check inside arg[1]/main.lua
+-- local source_path = "./" .. filename .. '/main.lua'
 local source_path = "./examples/" .. filename .. '.lua'
 
 -- WATCHER PROCESS

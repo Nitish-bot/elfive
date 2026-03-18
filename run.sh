@@ -6,8 +6,8 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-FOLDER=$1
-SOURCE="$FOLDER/main.lua"
+FILE=$1
+SOURCE="examples/$FILE.lua"
 DEST="./main.lua"
 
 # Validation
