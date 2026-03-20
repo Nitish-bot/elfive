@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "start": "bun x live-server . --port=5500"
+  }
+}
