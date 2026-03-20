@@ -7,6 +7,7 @@ function love.run()
 
 	define_env_globals()
 	if love.load then
+		-- luacheck: ignore
 		love.load(love.arg.parseGameArguments(arg), arg)
 	end
 	if love.timer then
@@ -37,6 +38,7 @@ function love.run()
 				end
 
 				-- Handle other events through the default handlers
+				-- luacheck: ignore love.handlers
 				if love.handlers[name] then
 					love.handlers[name](a, b, c, d, e, f)
 				end
@@ -379,12 +381,8 @@ function love.keyreleased(k)
 	L5_env.keyWasReleased = true
 
 	-- Only set keyIsPressed to false if no keys are pressed
-	local anyKeyPressed = false
-	for _ in pairs(L5_env.pressedKeys) do
-		anyKeyPressed = true
-		break
-	end
-	keyIsPressed = anyKeyPressed
+	-- LinterFix: Loop replaced because it only even runs once
+	keyIsPressed = (next(L5_env.pressedKeys) ~= nil)
 end
 
 function love.textinput(_text)
@@ -631,7 +629,7 @@ function toColor(_a, _b, _c, _d)
 				a = L5_env.color_max[4]
 			else -- HTML color name
 				if htmlColors[_a] then
-					r, g, b = unpack(htmlColors[_a])
+					r, g, b = table.unpack(htmlColors[_a])
 					a = L5_env.color_max[4]
 				else
 					error("Color '" .. _a .. "' not found in htmlColors table")
@@ -716,7 +714,7 @@ function HSVtoRGB(h, s, v)
 	local c = v * s
 	local x = c * (1 - math.abs((h % 2) - 1))
 	local m = v - c
-	local r, g, b = 0, 0, 0
+	local r, g, b
 	if h < 1 then
 		r, g, b = c, x, 0
 	elseif h < 2 then
@@ -741,7 +739,7 @@ function HSLtoRGB(h, s, l)
 	local c = (1 - math.abs(2 * l - 1)) * s
 	local x = c * (1 - math.abs((h % 2) - 1))
 	local m = l - c / 2
-	local r, g, b = 0, 0, 0
+	local r, g, b
 	if h < 1 then
 		r, g, b = c, x, 0
 	elseif h < 2 then
@@ -936,7 +934,7 @@ function defaults()
 	mouseX = 0
 	mouseY = 0
 	keyIsPressed = false
-	pmouseX, pmouseY, movedX, movedY = 0, 0
+	pmouseX, pmouseY, movedX, movedY = 0, 0, nil, nil
 	mouseButton = nil
 	focused = true
 	pixels = {}
@@ -1604,25 +1602,25 @@ function rect(_a, _b, _c, _d, _e)
 	if L5_env.rect_mode == CORNERS then --x1,y1,x2,y2
 		love.graphics.rectangle(L5_env.fill_mode, _a, _b, _c - _a, _d - _b, _e, _e)
 		local r, g, b, a = love.graphics.getColor()
-		love.graphics.setColor(unpack(L5_env.stroke_color))
+		love.graphics.setColor(table.unpack(L5_env.stroke_color))
 		love.graphics.rectangle("line", _a, _b, _c - _a, _d - _b, _e, _e)
 		love.graphics.setColor(r, g, b, a)
 	elseif L5_env.rect_mode == CENTER then --x-w/2,y-h/2,w,h
 		love.graphics.rectangle(L5_env.fill_mode, _a - _c / 2, _b - _d / 2, _c, _d, _e, _e)
 		local r, g, b, a = love.graphics.getColor()
-		love.graphics.setColor(unpack(L5_env.stroke_color))
+		love.graphics.setColor(table.unpack(L5_env.stroke_color))
 		love.graphics.rectangle("line", _a - _c / 2, _b - _d / 2, _c, _d, _e, _e)
 		love.graphics.setColor(r, g, b, a)
 	elseif L5_env.rect_mode == RADIUS then --x-w/2,y-h/2,r1*2,r2*2
 		love.graphics.rectangle(L5_env.fill_mode, _a - _c, _b - _d, _c * 2, _d * 2, _e, _e)
 		local r, g, b, a = love.graphics.getColor()
-		love.graphics.setColor(unpack(L5_env.stroke_color))
+		love.graphics.setColor(table.unpack(L5_env.stroke_color))
 		love.graphics.rectangle("line", _a - _c, _b - _d, _c * 2, _d * 2, _e, _e)
 		love.graphics.setColor(r, g, b, a)
 	elseif L5_env.rect_mode == CORNER then --CORNER default x,y,w,h
 		love.graphics.rectangle(L5_env.fill_mode, _a, _b, _c, _d, _e, _e)
 		local r, g, b, a = love.graphics.getColor()
-		love.graphics.setColor(unpack(L5_env.stroke_color))
+		love.graphics.setColor(table.unpack(L5_env.stroke_color))
 		love.graphics.rectangle("line", _a, _b, _c, _d, _e, _e)
 		love.graphics.setColor(r, g, b, a)
 	end
@@ -1634,19 +1632,19 @@ function square(_a, _b, _c, _d)
 	if L5_env.rect_mode == CENTER then --x-w/2,y-h/2,w,h
 		love.graphics.rectangle(L5_env.fill_mode, _a - _c / 2, _b - _c / 2, _c, _c, _d, _d)
 		local r, g, b, a = love.graphics.getColor()
-		love.graphics.setColor(unpack(L5_env.stroke_color))
+		love.graphics.setColor(table.unpack(L5_env.stroke_color))
 		love.graphics.rectangle("line", _a - _c / 2, _b - _c / 2, _c, _c, _d, _d)
 		love.graphics.setColor(r, g, b, a)
 	elseif L5_env.rect_mode == RADIUS then --x-w/2,y-h/2,r*2,r*2
 		love.graphics.rectangle(L5_env.fill_mode, _a - _c, _b - _c, _c * 2, _c * 2, _d, _d)
 		local r, g, b, a = love.graphics.getColor()
-		love.graphics.setColor(unpack(L5_env.stroke_color))
+		love.graphics.setColor(table.unpack(L5_env.stroke_color))
 		love.graphics.rectangle("line", _a - _c, _b - _c, _c * 2, _c * 2, _d, _d)
 		love.graphics.setColor(r, g, b, a)
 	elseif L5_env.rect_mode == CORNER then -- CORNER default x,y,w,h
 		love.graphics.rectangle(L5_env.fill_mode, _a, _b, _c, _c, _d, _d)
 		local r, g, b, a = love.graphics.getColor()
-		love.graphics.setColor(unpack(L5_env.stroke_color))
+		love.graphics.setColor(table.unpack(L5_env.stroke_color))
 		love.graphics.rectangle("line", _a, _b, _c, _c, _d, _d)
 		love.graphics.setColor(r, g, b, a)
 	end
@@ -1660,25 +1658,25 @@ function ellipse(_a, _b, _c, _d)
 	if L5_env.ellipse_mode == RADIUS then
 		love.graphics.ellipse(L5_env.fill_mode, _a, _b, _c, _d)
 		local r, g, b, a = love.graphics.getColor()
-		love.graphics.setColor(unpack(L5_env.stroke_color))
+		love.graphics.setColor(table.unpack(L5_env.stroke_color))
 		love.graphics.ellipse("line", _a, _b, _c, _d)
 		love.graphics.setColor(r, g, b, a)
 	elseif L5_env.ellipse_mode == CORNER then
 		love.graphics.ellipse(L5_env.fill_mode, _a + _c / 2, _b + _d / 2, _c / 2, _d / 2)
 		local r, g, b, a = love.graphics.getColor()
-		love.graphics.setColor(unpack(L5_env.stroke_color))
+		love.graphics.setColor(table.unpack(L5_env.stroke_color))
 		love.graphics.ellipse("line", _a + _c / 2, _b + _d / 2, _c / 2, _d / 2)
 		love.graphics.setColor(r, g, b, a)
 	elseif L5_env.ellipse_mode == CORNERS then
 		love.graphics.ellipse(L5_env.fill_mode, _a + (_c - _a) / 2, _b + (_d - _a) / 2, (_c - _a) / 2, (_d - _b) / 2)
 		local r, g, b, a = love.graphics.getColor()
-		love.graphics.setColor(unpack(L5_env.stroke_color))
+		love.graphics.setColor(table.unpack(L5_env.stroke_color))
 		love.graphics.ellipse("line", _a + (_c - _a) / 2, _b + (_d - _a) / 2, (_c - _a) / 2, (_d - _b) / 2)
 		love.graphics.setColor(r, g, b, a)
 	else --default CENTER x,y,w/2,h/2
 		love.graphics.ellipse(L5_env.fill_mode, _a, _b, _c / 2, _d / 2)
 		local r, g, b, a = love.graphics.getColor()
-		love.graphics.setColor(unpack(L5_env.stroke_color))
+		love.graphics.setColor(table.unpack(L5_env.stroke_color))
 		love.graphics.ellipse("line", _a, _b, _c / 2, _d / 2)
 		love.graphics.setColor(r, g, b, a)
 	end
@@ -1688,35 +1686,36 @@ function circle(_a, _b, _c)
 	if L5_env.ellipse_mode == RADIUS then
 		love.graphics.ellipse(L5_env.fill_mode, _a, _b, _c, _c)
 		local r, g, b, a = love.graphics.getColor()
-		love.graphics.setColor(unpack(L5_env.stroke_color))
+		love.graphics.setColor(table.unpack(L5_env.stroke_color))
 		love.graphics.ellipse("line", _a, _b, _c, _d)
 		love.graphics.setColor(r, g, b, a)
 	elseif L5_env.ellipse_mode == CORNER then
 		love.graphics.ellipse(L5_env.fill_mode, _a + _c / 2, _b + _c / 2, _c / 2, _c / 2)
 		local r, g, b, a = love.graphics.getColor()
-		love.graphics.setColor(unpack(L5_env.stroke_color))
+		love.graphics.setColor(table.unpack(L5_env.stroke_color))
 		love.graphics.ellipse("line", _a + _c / 2, _b + _c / 2, _c / 2, _c / 2)
 		love.graphics.setColor(r, g, b, a)
 	elseif L5_env.ellipse_mode == CORNERS then
 		love.graphics.ellipse(L5_env.fill_mode, _a + (_c - _a) / 2, _b + (_c - _a) / 2, (_c - _a) / 2, (_c - _b) / 2)
 		local r, g, b, a = love.graphics.getColor()
-		love.graphics.setColor(unpack(L5_env.stroke_color))
+		love.graphics.setColor(table.unpack(L5_env.stroke_color))
 		love.graphics.ellipse("line", _a + (_c - _a) / 2, _b + (_c - _a) / 2, (_c - _a) / 2, (_c - _b) / 2)
 		love.graphics.setColor(r, g, b, a)
 	elseif L5_env.ellipse_mode == CENTER then --default CENTER x,y,w/2,h/2
 		love.graphics.ellipse(L5_env.fill_mode, _a, _b, _c / 2, _c / 2)
 		local r, g, b, a = love.graphics.getColor()
-		love.graphics.setColor(unpack(L5_env.stroke_color))
+		love.graphics.setColor(table.unpack(L5_env.stroke_color))
 		love.graphics.ellipse("line", _a, _b, _c / 2, _c / 2)
 		love.graphics.setColor(r, g, b, a)
 	end
 end
 
-function quad(_x1, _y1, _x2, _y2, _x3, _y3, _x4, _y4) --this is a 4-sided love2d polygon! a quad implies an applied texture
+--this is a 4-sided love2d polygon! a quad implies an applied texture
+function quad(_x1, _y1, _x2, _y2, _x3, _y3, _x4, _y4)
 	--for other # of sides, use processing api call createShape
 	love.graphics.polygon(L5_env.fill_mode, _x1, _y1, _x2, _y2, _x3, _y3, _x4, _y4)
 	local r, g, b, a = love.graphics.getColor()
-	love.graphics.setColor(unpack(L5_env.stroke_color))
+	love.graphics.setColor(table.unpack(L5_env.stroke_color))
 	love.graphics.polygon("line", _x1, _y1, _x2, _y2, _x3, _y3, _x4, _y4)
 	love.graphics.setColor(r, g, b, a)
 end
@@ -1724,7 +1723,7 @@ end
 function triangle(_x1, _y1, _x2, _y2, _x3, _y3) --this is a 3-sided love2d polygon
 	love.graphics.polygon(L5_env.fill_mode, _x1, _y1, _x2, _y2, _x3, _y3)
 	local r, g, b, a = love.graphics.getColor()
-	love.graphics.setColor(unpack(L5_env.stroke_color))
+	love.graphics.setColor(table.unpack(L5_env.stroke_color))
 	love.graphics.polygon("line", _x1, _y1, _x2, _y2, _x3, _y3)
 	love.graphics.setColor(r, g, b, a)
 end
@@ -1802,7 +1801,7 @@ function arc(_x, _y, _w, _h, _start, _stop, _arctype)
 
 		if L5_env.stroke_color then
 			local r, g, b, a = love.graphics.getColor()
-			love.graphics.setColor(unpack(L5_env.stroke_color))
+			love.graphics.setColor(table.unpack(L5_env.stroke_color))
 			love.graphics.ellipse("line", center_x, center_y, radius_x, radius_y)
 			love.graphics.setColor(r, g, b, a)
 		end
@@ -1818,7 +1817,7 @@ function arc(_x, _y, _w, _h, _start, _stop, _arctype)
 
 			if L5_env.stroke_color then
 				local r, g, b, a = love.graphics.getColor()
-				love.graphics.setColor(unpack(L5_env.stroke_color))
+				love.graphics.setColor(table.unpack(L5_env.stroke_color))
 				love.graphics.arc("line", arctype, center_x, center_y, radius, start_norm, start_norm + arc_span)
 				love.graphics.setColor(r, g, b, a)
 			end
@@ -1847,6 +1846,7 @@ function draw_elliptical_arc(cx, cy, rx, ry, start_angle, arc_span, arctype)
 		-- Add center point for pie
 		table.insert(vertices, 1, cy) -- Insert at position 2 (after first vertex)
 		table.insert(vertices, 1, cx) -- Insert at position 1
+	-- luacheck: ignore
 	elseif arctype == CHORD then
 		-- Close the arc by connecting endpoints
 		-- vertices already has the right points
@@ -1866,7 +1866,7 @@ function draw_elliptical_arc(cx, cy, rx, ry, start_angle, arc_span, arctype)
 	-- Draw stroke
 	if L5_env.stroke_color then
 		local r, g, b, a = love.graphics.getColor()
-		love.graphics.setColor(unpack(L5_env.stroke_color))
+		love.graphics.setColor(table.unpack(L5_env.stroke_color))
 
 		if arctype == OPEN then
 			-- Just draw the arc line
@@ -1889,7 +1889,7 @@ function point(_x, _y)
 	--Points unaffected by love.graphics.scale - size is always in pixels
 	--a line is drawn in the stroke color
 	local r, g, b, a = love.graphics.getColor()
-	love.graphics.setColor(unpack(L5_env.stroke_color))
+	love.graphics.setColor(table.unpack(L5_env.stroke_color))
 	love.graphics.points(_x, _y)
 	love.graphics.setColor(r, g, b, a)
 end
@@ -1897,7 +1897,7 @@ end
 function line(_x1, _y1, _x2, _y2)
 	--a line is drawn in the stroke color
 	local r, g, b, a = love.graphics.getColor()
-	love.graphics.setColor(unpack(L5_env.stroke_color))
+	love.graphics.setColor(table.unpack(L5_env.stroke_color))
 	love.graphics.line(_x1, _y1, _x2, _y2)
 	love.graphics.setColor(r, g, b, a)
 end
@@ -1907,7 +1907,7 @@ function background(_r, _g, _b, _a)
 		image(_r, 0, 0, width, height)
 	else
 		local prevR, prevG, prevB, prevA = love.graphics.getColor()
-		love.graphics.setColor(unpack(toColor(_r, _g, _b, _a)))
+		love.graphics.setColor(table.unpack(toColor(_r, _g, _b, _a)))
 		love.graphics.rectangle("fill", 0, 0, width, height)
 		love.graphics.setColor(prevR, prevG, prevB, prevA)
 		L5_env.clearscreen = true
@@ -1959,13 +1959,13 @@ function fill(...)
 		-- Check if it's normalized (all values <= 1.0) or raw array
 		if t[1] <= 1.0 and t[2] <= 1.0 and t[3] <= 1.0 and (not t[4] or t[4] <= 1.0) then
 			-- Already normalized, use directly
-			love.graphics.setColor(unpack(t))
+			love.graphics.setColor(table.unpack(t))
 		else
 			-- Raw array, needs conversion
-			love.graphics.setColor(unpack(toColor(unpack(t))))
+			love.graphics.setColor(table.unpack(toColor(table.unpack(t))))
 		end
 	else
-		love.graphics.setColor(unpack(toColor(...)))
+		love.graphics.setColor(table.unpack(toColor(...)))
 	end
 end
 
@@ -2600,7 +2600,7 @@ function endShape()
 			-- Use regular polygon for non-textured shapes
 			love.graphics.polygon("fill", L5_env.vertices)
 			local r, g, b, a = love.graphics.getColor()
-			love.graphics.setColor(unpack(L5_env.stroke_color))
+			love.graphics.setColor(table.unpack(L5_env.stroke_color))
 			love.graphics.polygon("line", L5_env.vertices)
 			love.graphics.setColor(r, g, b, a)
 		end
@@ -2627,7 +2627,7 @@ function bezier(x1, y1, x2, y2, x3, y3, x4, y4)
 
 	-- Draw stroke
 	local r, g, b, a = love.graphics.getColor()
-	love.graphics.setColor(unpack(L5_env.stroke_color))
+	love.graphics.setColor(table.unpack(L5_env.stroke_color))
 	love.graphics.line(points)
 	love.graphics.setColor(r, g, b, a)
 end
@@ -2817,21 +2817,21 @@ end
 
 function max(...)
 	local args = { ... }
-	-- If single table argument, unpack it
+	-- If single table argument, table.unpack it
 	if #args == 1 and type(args[1]) == "table" then
-		return math.max(unpack(args[1]))
+		return math.max(table.unpack(args[1]))
 	else
-		return math.max(unpack(args))
+		return math.max(table.unpack(args))
 	end
 end
 
 function min(...)
 	local args = { ... }
-	-- If single table argument, unpack it
+	-- If single table argument, table.unpack it
 	if #args == 1 and type(args[1]) == "table" then
-		return math.min(unpack(args[1]))
+		return math.min(table.unpack(args[1]))
 	else
-		return math.min(unpack(args))
+		return math.min(table.unpack(args))
 	end
 end
 
@@ -3537,7 +3537,7 @@ end
 function tint(...)
 	local args = { ... }
 	if #args == 1 and type(args[1]) == "table" then
-		L5_env.currentTint = toColor(unpack(args[1]))
+		L5_env.currentTint = toColor(table.unpack(args[1]))
 	else
 		L5_env.currentTint = toColor(...)
 	end
@@ -3548,6 +3548,7 @@ function noTint()
 end
 
 -- Override love.graphics.draw to automatically apply tint
+-- luacheck: ignore
 local originalDraw = love.graphics.draw
 function love.graphics.draw(drawable, x, y, r, sx, sy, ox, oy, kx, ky)
 	local prevR, prevG, prevB, prevA = love.graphics.getColor()
@@ -3563,7 +3564,7 @@ function love.graphics.draw(drawable, x, y, r, sx, sy, ox, oy, kx, ky)
 		type(actualDrawable) == "userdata" and (actualDrawable:type() == "Image" or actualDrawable:type() == "Video")
 	then
 		if L5_env.currentTint then
-			love.graphics.setColor(unpack(L5_env.currentTint))
+			love.graphics.setColor(table.unpack(L5_env.currentTint))
 		else
 			love.graphics.setColor(1, 1, 1, 1) -- No tint = white
 		end
@@ -3575,9 +3576,9 @@ end
 
 function cursor(_cursor_icon, hotX, hotY)
 	love.mouse.setVisible(true)
-	local _cursor_icon = _cursor_icon or "arrow"
-	local hotX = hotX or 0
-	local hotY = hotY or 0
+	local cursor_icon = _cursor_icon or "arrow"
+	local hotXFloor = hotX or 0
+	local hotYFloor = hotY or 0
 
 	-- Check if it's a system cursor type
 	local systemCursors = {
@@ -3597,7 +3598,7 @@ function cursor(_cursor_icon, hotX, hotY)
 
 	local isSystemCursor = false
 	for _, cursorType in ipairs(systemCursors) do
-		if _cursor_icon == cursorType then
+		if cursor_icon == cursorType then
 			isSystemCursor = true
 			break
 		end
@@ -3605,16 +3606,16 @@ function cursor(_cursor_icon, hotX, hotY)
 
 	if isSystemCursor then
 		-- Use system cursor
-		local _cursor = love.mouse.getSystemCursor(_cursor_icon)
+		local _cursor = love.mouse.getSystemCursor(cursor_icon)
 		love.mouse.setCursor(_cursor)
-	elseif type(_cursor_icon) == "userdata" and _cursor_icon:type() == "ImageData" then
+	elseif type(cursor_icon) == "userdata" and cursor_icon:type() == "ImageData" then
 		-- Use ImageData directly
-		local _cursor = love.mouse.newCursor(_cursor_icon, hotX, hotY)
+		local _cursor = love.mouse.newCursor(cursor_icon, hotXFloor, hotYFloor)
 		love.mouse.setCursor(_cursor)
-	elseif type(_cursor_icon) == "string" then
+	elseif type(cursor_icon) == "string" then
 		-- Treat as file path to custom cursor image
-		local cursorImage = love.image.newImageData(_cursor_icon)
-		local _cursor = love.mouse.newCursor(cursorImage, hotX, hotY)
+		local cursorImage = love.image.newImageData(cursor_icon)
+		local _cursor = love.mouse.newCursor(cursorImage, hotXFloor, hotYFloor)
 		love.mouse.setCursor(_cursor)
 	end
 end
@@ -3881,7 +3882,7 @@ function set(x, y, c)
 		local prevColor = { love.graphics.getColor() }
 		love.graphics.setColor(c[1], c[2], c[3], c[4] or 1)
 		love.graphics.points(x, y)
-		love.graphics.setColor(unpack(prevColor))
+		love.graphics.setColor(table.unpack(prevColor))
 		if not wasActive then
 			love.graphics.setCanvas()
 		end
@@ -3893,7 +3894,7 @@ function set(x, y, c)
 		local normalized = c / 255
 		love.graphics.setColor(normalized, normalized, normalized, 1)
 		love.graphics.points(x, y)
-		love.graphics.setColor(unpack(prevColor))
+		love.graphics.setColor(table.unpack(prevColor))
 		if not wasActive then
 			love.graphics.setCanvas()
 		end
@@ -3915,7 +3916,7 @@ L5_filter = {}
 
 L5_filter.grayscale = createShaderSafe(
 	[[
-    vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
+    vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords)
     {
         vec4 pixel = Texel(texture, texture_coords);
         float gray = dot(pixel.rgb, vec3(0.299, 0.587, 0.114));
@@ -3939,7 +3940,7 @@ vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords 
 	vec4 tx = Texel( texture, texture_coords );
 	float l = (tx.r + tx.g + tx.b) * 0.333333;
 	vec3 col = vec3( smoothstep(a, b, l) );
-	
+
 	return vec4( col, 1.0 ) * color;
   }
 ]],
@@ -3948,12 +3949,12 @@ vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords 
 
 -- from https://www.reddit.com/r/love2d/comments/ee8n0j/how_to_make_inverted_colornegative_shader/fcaouw5/
 L5_filter.invert = createShaderSafe(
-	[[ 
-vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 pixel_coords) 
-  { 
-	vec4 col = Texel( texture, texture_coords ); 
-	return vec4(1.0-col.r, 1.0-col.g, 1.0-col.b, col.a) * color; 
-  } 
+	[[
+vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 pixel_coords)
+  {
+	vec4 col = Texel( texture, texture_coords );
+	return vec4(1.0-col.r, 1.0-col.g, 1.0-col.b, col.a) * color;
+  }
 ]],
 	"Invert shader failed to compile - filter unavailable"
 )
@@ -3961,14 +3962,14 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 pixel_coords)
 L5_filter.posterize = createShaderSafe(
 	[[
     uniform float levels;
-    
+
     vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
         vec4 pixel = Texel(texture, texture_coords);
-        
+
         pixel.r = floor(pixel.r * levels) / levels;
         pixel.g = floor(pixel.g * levels) / levels;
         pixel.b = floor(pixel.b * levels) / levels;
-        
+
         return pixel * color;
     }
 ]],
@@ -3980,33 +3981,33 @@ L5_filter.blur_horizontal = createShaderSafe(
 	[[
     uniform float blurRadius;
     uniform vec2 textureSize;
-    
+
     vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
         vec2 pixelSize = 1.0 / textureSize;
-        
+
         // Clamp to minimum radius to avoid divide by zero
         float safeRadius = max(blurRadius, 0.01);
 
         vec4 sum = vec4(0.0);
         float totalWeight = 0.0;
-        
-        const int maxSamples = 32;        
-        
+
+        const int maxSamples = 32;
+
         // Horizontal pass only
         for(int x = -maxSamples; x <= maxSamples; x++) {
             float fx = float(x);
             float distance = abs(fx);
-            
-	    if (distance > safeRadius) continue;            
+
+	    if (distance > safeRadius) continue;
 
             float radiusi = safeRadius - distance;
             float weight = radiusi * radiusi;
-            
+
             vec2 offset = vec2(fx, 0.0) * pixelSize;
             sum += Texel(texture, texture_coords + offset) * weight;
             totalWeight += weight;
         }
-        
+
         return (sum / totalWeight) * color;
     }
 ]],
@@ -4017,32 +4018,32 @@ L5_filter.blur_vertical = createShaderSafe(
 	[[
     uniform float blurRadius;
     uniform vec2 textureSize;
-    
+
     vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
         vec2 pixelSize = 1.0 / textureSize;
 
 	// Clamp to minimum radius to avoid divide by zero
         float safeRadius = max(blurRadius, 0.01);
-        
+
         vec4 sum = vec4(0.0);
         float totalWeight = 0.0;
-        
-        const int maxSamples = 32;        
+
+        const int maxSamples = 32;
 
         // Vertical pass only
         for(int y = -maxSamples; y <= maxSamples; y++) {
             float fy = float(y);
             float distance = abs(fy);
-            
-            if (distance > safeRadius) continue;            
+
+            if (distance > safeRadius) continue;
             float radiusi = safeRadius - distance;
             float weight = radiusi * radiusi;
-            
+
             vec2 offset = vec2(0.0, fy) * pixelSize;
             sum += Texel(texture, texture_coords + offset) * weight;
             totalWeight += weight;
         }
-        
+
         return (sum / totalWeight) * color;
     }
 ]],
@@ -4057,11 +4058,11 @@ if not L5_filter.blurSupportsParameter then
 	L5_filter.blur = createShaderSafe(
 		[[
         uniform vec2 textureSize;
-        
+
         vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
             vec2 pixelSize = 1.0 / textureSize;
             vec4 sum = vec4(0.0);
-            
+
             // 3x3 Gaussian kernel (radius 1)
             sum += Texel(texture, texture_coords + vec2(-1.0, -1.0) * pixelSize) * 1.0;
             sum += Texel(texture, texture_coords + vec2( 0.0, -1.0) * pixelSize) * 2.0;
@@ -4072,7 +4073,7 @@ if not L5_filter.blurSupportsParameter then
             sum += Texel(texture, texture_coords + vec2(-1.0,  1.0) * pixelSize) * 1.0;
             sum += Texel(texture, texture_coords + vec2( 0.0,  1.0) * pixelSize) * 2.0;
             sum += Texel(texture, texture_coords + vec2( 1.0,  1.0) * pixelSize) * 1.0;
-            
+
             return (sum / 16.0) * color;
         }
     ]],
@@ -4084,50 +4085,50 @@ L5_filter.erode = createShaderSafe(
 	[[
     uniform float strength;
     uniform vec2 textureSize;
-    
+
     vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
         vec2 pixelSize = 1.0 / textureSize;
-        
+
         vec4 centerColor = Texel(texture, texture_coords);
         vec4 result = centerColor;
-        
+
         // 3x3 erosion - unrolled for compatibility
         vec2 offset;
         vec4 neighborColor;
-        
+
         // Manually unroll the 3x3 kernel (excluding center)
         offset = vec2(-1.0, -1.0) * pixelSize * strength;
         neighborColor = Texel(texture, texture_coords + offset);
         result = mix(result, min(result, neighborColor), 0.3);
-        
+
         offset = vec2(0.0, -1.0) * pixelSize * strength;
         neighborColor = Texel(texture, texture_coords + offset);
         result = mix(result, min(result, neighborColor), 0.3);
-        
+
         offset = vec2(1.0, -1.0) * pixelSize * strength;
         neighborColor = Texel(texture, texture_coords + offset);
         result = mix(result, min(result, neighborColor), 0.3);
-        
+
         offset = vec2(-1.0, 0.0) * pixelSize * strength;
         neighborColor = Texel(texture, texture_coords + offset);
         result = mix(result, min(result, neighborColor), 0.3);
-        
+
         offset = vec2(1.0, 0.0) * pixelSize * strength;
         neighborColor = Texel(texture, texture_coords + offset);
         result = mix(result, min(result, neighborColor), 0.3);
-        
+
         offset = vec2(-1.0, 1.0) * pixelSize * strength;
         neighborColor = Texel(texture, texture_coords + offset);
         result = mix(result, min(result, neighborColor), 0.3);
-        
+
         offset = vec2(0.0, 1.0) * pixelSize * strength;
         neighborColor = Texel(texture, texture_coords + offset);
         result = mix(result, min(result, neighborColor), 0.3);
-        
+
         offset = vec2(1.0, 1.0) * pixelSize * strength;
         neighborColor = Texel(texture, texture_coords + offset);
         result = mix(result, min(result, neighborColor), 0.3);
-        
+
         return result * color;
     }
 ]],
@@ -4139,15 +4140,15 @@ L5_filter.dilate = createShaderSafe(
     uniform float strength;
     uniform float threshold;
     uniform vec2 textureSize;
-    
+
     vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
         vec2 pixelSize = 1.0 / textureSize;
-        
+
         vec4 centerColor = Texel(texture, texture_coords);
         vec4 maxColor = centerColor;
-        
+
         float centerBrightness = dot(centerColor.rgb, vec3(0.299, 0.587, 0.114));
-        
+
         // Only dilate if center pixel is bright enough
         if (centerBrightness > threshold) {
             // Simplified 3x3 dilation
@@ -4155,7 +4156,7 @@ L5_filter.dilate = createShaderSafe(
             vec4 neighborColor;
             float neighborBrightness;
             float weight;
-            
+
             // Unroll 3x3 kernel (excluding center)
             offset = vec2(-1.0, -1.0) * pixelSize;
             neighborColor = Texel(texture, texture_coords + offset);
@@ -4164,7 +4165,7 @@ L5_filter.dilate = createShaderSafe(
                 weight = 1.0 - 1.414 / (strength + 1.0);
                 maxColor = max(maxColor, neighborColor * weight);
             }
-            
+
             offset = vec2(0.0, -1.0) * pixelSize;
             neighborColor = Texel(texture, texture_coords + offset);
             neighborBrightness = dot(neighborColor.rgb, vec3(0.299, 0.587, 0.114));
@@ -4172,7 +4173,7 @@ L5_filter.dilate = createShaderSafe(
                 weight = 1.0 - 1.0 / (strength + 1.0);
                 maxColor = max(maxColor, neighborColor * weight);
             }
-            
+
             offset = vec2(1.0, -1.0) * pixelSize;
             neighborColor = Texel(texture, texture_coords + offset);
             neighborBrightness = dot(neighborColor.rgb, vec3(0.299, 0.587, 0.114));
@@ -4180,7 +4181,7 @@ L5_filter.dilate = createShaderSafe(
                 weight = 1.0 - 1.414 / (strength + 1.0);
                 maxColor = max(maxColor, neighborColor * weight);
             }
-            
+
             offset = vec2(-1.0, 0.0) * pixelSize;
             neighborColor = Texel(texture, texture_coords + offset);
             neighborBrightness = dot(neighborColor.rgb, vec3(0.299, 0.587, 0.114));
@@ -4188,7 +4189,7 @@ L5_filter.dilate = createShaderSafe(
                 weight = 1.0 - 1.0 / (strength + 1.0);
                 maxColor = max(maxColor, neighborColor * weight);
             }
-            
+
             offset = vec2(1.0, 0.0) * pixelSize;
             neighborColor = Texel(texture, texture_coords + offset);
             neighborBrightness = dot(neighborColor.rgb, vec3(0.299, 0.587, 0.114));
@@ -4196,7 +4197,7 @@ L5_filter.dilate = createShaderSafe(
                 weight = 1.0 - 1.0 / (strength + 1.0);
                 maxColor = max(maxColor, neighborColor * weight);
             }
-            
+
             offset = vec2(-1.0, 1.0) * pixelSize;
             neighborColor = Texel(texture, texture_coords + offset);
             neighborBrightness = dot(neighborColor.rgb, vec3(0.299, 0.587, 0.114));
@@ -4204,7 +4205,7 @@ L5_filter.dilate = createShaderSafe(
                 weight = 1.0 - 1.414 / (strength + 1.0);
                 maxColor = max(maxColor, neighborColor * weight);
             }
-            
+
             offset = vec2(0.0, 1.0) * pixelSize;
             neighborColor = Texel(texture, texture_coords + offset);
             neighborBrightness = dot(neighborColor.rgb, vec3(0.299, 0.587, 0.114));
@@ -4212,7 +4213,7 @@ L5_filter.dilate = createShaderSafe(
                 weight = 1.0 - 1.0 / (strength + 1.0);
                 maxColor = max(maxColor, neighborColor * weight);
             }
-            
+
             offset = vec2(1.0, 1.0) * pixelSize;
             neighborColor = Texel(texture, texture_coords + offset);
             neighborBrightness = dot(neighborColor.rgb, vec3(0.299, 0.587, 0.114));
@@ -4221,7 +4222,7 @@ L5_filter.dilate = createShaderSafe(
                 maxColor = max(maxColor, neighborColor * weight);
             }
         }
-        
+
         return maxColor * color;
     }
 ]],

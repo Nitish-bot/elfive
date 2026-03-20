@@ -1,0 +1,20 @@
+{
+  "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
+  "runtime.version": "Lua 5.2",
+  "workspace.library": ["./love2d-luacats"],
+  "runtime.special": {
+    "love.filesystem.load": "loadfile"
+  },
+  "diagnostics": {
+    "disable": [
+      "duplicate-set-field",
+      "lowercase-global",
+      "undefined-global"
+    ],
+    "globals": [
+      "L5_env",
+      "L5_filter",
+      "htmlColors"
+    ]
+  }
+}
