@@ -190,8 +190,8 @@ function love.update(dt)
 	end
 
 	mouseX, mouseY = love.mouse.getPosition()
-	movedX = mouseX - pmouseX
-	movedY = mouseY - pmouseY
+	movedX = mouseX - prevMouseX
+	movedY = mouseY - prevMouseY
 	deltaTime = dt * 1000
 	key = updateLastKeyPressed()
 
@@ -308,7 +308,7 @@ function love.draw()
 			draw()
 		end
 
-		pmouseX, pmouseY = mouseX, mouseY
+		prevMouseX, prevMouseY = mouseX, mouseY
 
 		love.graphics.pop()
 	end
@@ -937,7 +937,7 @@ function defaults()
 	mouseX = 0
 	mouseY = 0
 	keyIsPressed = false
-	pmouseX, pmouseY, movedX, movedY = 0, 0, nil, nil
+	prevMouseX, prevMouseY, movedX, movedY = 0, 0, nil, nil
 	mouseButton = nil
 	focused = true
 	pixels = {}
@@ -1176,7 +1176,7 @@ end
 
 function saveStrings(data, filename)
 	local lines = {}
-	for i, value in ipairs(data) do
+	for _, value in ipairs(data) do
 		table.insert(lines, tostring(value))
 	end
 	local content = table.concat(lines, "\n")
@@ -1219,7 +1219,7 @@ function saveTable(data, filename, format)
 			local lines = {}
 			table.insert(lines, "{")
 
-			for i, value in ipairs(tbl) do
+			for _, value in ipairs(tbl) do
 				if type(value) == "table" then
 					table.insert(lines, indent .. "  " .. serializeTable(value, indent .. "  ") .. ",")
 				else
@@ -1287,7 +1287,7 @@ function saveTable(data, filename, format)
 				table.insert(lines, table.concat(headers, separator))
 
 				-- Add data rows using headers
-				for i, row in ipairs(records) do -- Fixed: use records
+				for _, row in ipairs(records) do -- Fixed: use records
 					local values = {}
 					for _, header in ipairs(headers) do
 						table.insert(values, tostring(row[header] or ""))
@@ -1296,7 +1296,7 @@ function saveTable(data, filename, format)
 				end
 			else
 				-- Array-style table, just use indices
-				for i, row in ipairs(records) do -- Fixed: use records
+				for _, row in ipairs(records) do -- Fixed: use records
 					if type(row) == "table" then
 						local values = {}
 						for _, value in ipairs(row) do
@@ -1310,7 +1310,7 @@ function saveTable(data, filename, format)
 			end
 		else
 			-- Simple array
-			for i, value in ipairs(records) do -- Fixed: use records
+			for _, value in ipairs(records) do -- Fixed: use records
 				table.insert(lines, tostring(value))
 			end
 		end
@@ -2620,7 +2620,7 @@ function bezier(x1, y1, x2, y2, x3, y3, x4, y4)
 	if L5_env.fill_mode == "fill" then
 		-- Close the shape by connecting end point back to start
 		local closedPoints = {}
-		for i, v in ipairs(points) do
+		for _, v in ipairs(points) do
 			table.insert(closedPoints, v)
 		end
 		-- Add line back to start to close the shape
