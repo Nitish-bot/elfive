@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Check if folder argument is provided
+# Check if filename argument is provided
 if [ -z "$1" ]; then
-    echo "Usage: ./run.sh <folder_name>"
+    echo "Usage: ./run.sh <file_name>"
     exit 1
 fi
 
-FOLDER=$1
-SOURCE="$FOLDER/main.lua"
+FILE=$1
+SOURCE="examples/$FILE.lua"
 DEST="./main.lua"
 
 # Validation
