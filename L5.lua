@@ -1,14 +1,16 @@
 -- L5 0.1.5 (c) Lee Tusman and Contributors GNU LGPL2.1
 VERSION = "0.1.5"
 
+---@diagnostic disable
 -- Override love.run() - adds double buffering and custom events
 function love.run()
 	defaults()
 
 	define_env_globals()
 	if love.load then
-		-- luacheck: ignore
+		-- luacheck: push ignore
 		love.load(love.arg.parseGameArguments(arg), arg)
+		-- luacheck: pop
 	end
 	if love.timer then
 		love.timer.step()
@@ -38,10 +40,11 @@ function love.run()
 				end
 
 				-- Handle other events through the default handlers
-				-- luacheck: ignore love.handlers
+				-- luacheck: push ignore
 				if love.handlers[name] then
 					love.handlers[name](a, b, c, d, e, f)
 				end
+				-- luacheck: pop
 			end
 		end
 
@@ -1846,11 +1849,13 @@ function draw_elliptical_arc(cx, cy, rx, ry, start_angle, arc_span, arctype)
 		-- Add center point for pie
 		table.insert(vertices, 1, cy) -- Insert at position 2 (after first vertex)
 		table.insert(vertices, 1, cx) -- Insert at position 1
-	-- luacheck: ignore
+	-- luacheck: push ignore
 	elseif arctype == CHORD then
 		-- Close the arc by connecting endpoints
 		-- vertices already has the right points
 	end
+	-- luacheck: pop
+
 	-- "open" type doesn't need modification
 
 	-- Draw filled arc
