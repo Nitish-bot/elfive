@@ -1,4 +1,5 @@
 ---@meta
+---@diagnostic disable
 
 ---
 ---Provides system-independent mathematical functions.

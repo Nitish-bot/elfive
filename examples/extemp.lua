@@ -18,7 +18,7 @@ function draw()
 	if sound == nil or sound2 == nil then
 		text("loading sound", 10, 10)
 	elseif not hasStarted then
-        sound:start()
+		sound:start()
 		sound2:start()
 		hasStarted = true
 	end
@@ -33,11 +33,11 @@ function mouseClicked()
 end
 
 function keyPressed()
-    if key == 'p' then
-        if sound2:isPlaying() then
-            sound:pause()
-        else
-            sound:play()
-        end
-    end
+	if key == "p" then
+		if sound2:isPlaying() then
+			sound:pause()
+		else
+			sound:play()
+		end
+	end
 end

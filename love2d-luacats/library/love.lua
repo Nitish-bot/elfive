@@ -1,5 +1,5 @@
 ---@meta
-
+---@diagnostic disable
 -- version: 11.5
 ---
 ---[Open in Browser](https://love2d.org/wiki/love)
