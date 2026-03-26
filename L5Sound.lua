@@ -1,5 +1,5 @@
 function loadSound(_file)
-  -- apart from path file can also be Decoder or SoundData (love2d objects)
+  -- apart from path, file can also be Decoder or SoundData (love2d objects)
   local success, result = pcall(love.audio.newSource, _file, "static")
 
   if success then
